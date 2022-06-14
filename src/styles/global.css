@@ -1,0 +1,27 @@
+:root {
+  --color-primary: #1e3a8a;
+  --color-secondary: #004dea;
+  --color-text-white: #fff;
+  --color-text-black: #1f2937;
+  --color-button: #1bb553;
+  --color-button-hover: #1dc159;
+  --color-warning: #ff9a1f;
+  --color-problem: #ff2020;
+}
+
+.header {
+  background: linear-gradient(
+    to right,
+    var(--color-primary),
+    var(--color-secondary)
+  );
+
+  display: flex;
+  height: 80px;
+  align-items: center;
+}
+
+.header img {
+  height: 30%;
+  width: auto;
+}

@@ -1,0 +1,28 @@
+.content {
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
+
+  height: calc(100vh - 80px);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+
+  justify-content: center;
+
+  width: 30%;
+  height: max-content;
+
+  box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+}
+
+.form h1 {
+  margin-left: 5%;
+  margin-top: 3%;
+  font-size: 2rem;
+}
