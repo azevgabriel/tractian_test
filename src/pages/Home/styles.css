@@ -1,0 +1,32 @@
+.content {
+  height: calc(100vh - 80px);
+  background-color: #e0e0e0;
+}
+
+.content div {
+  height: 100%;
+}
+
+.content-left {
+  display: flex;
+  flex-direction: column;
+
+  height: 100%;
+  padding: 10px 0;
+}
+
+.userDescription {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+
+  width: 85%;
+  margin: 0 auto;
+  height: max-content;
+  padding: 5px 0;
+}
+
+.userDescription h1,
+.userDescription p {
+  color: var(--color-text-white);
+}

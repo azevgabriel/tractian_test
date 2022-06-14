@@ -11,6 +11,7 @@ import { api } from '../lib/api';
 interface AuthContextData {
   signIn: (email: string) => Promise<void>;
   user: IUser | null;
+  signOut: () => void;
 }
 
 interface AuthProviderProps {
@@ -31,10 +32,15 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
     setUser(user);
   }, []);
 
+  const signOut = useCallback(() => {
+    setUser(null);
+  }, []);
+
   return (
     <AuthContext.Provider
       value={{
         signIn,
+        signOut,
         user,
       }}
     >

@@ -1,11 +1,18 @@
 .content {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
 
   align-items: center;
-  justify-content: center;
+  justify-content: space-evenly;
 
   height: calc(100vh - 80px);
+
+  background-color: #e0e0e0;
+}
+
+.content img {
+  height: 100%;
+  width: auto;
 }
 
 .form {
@@ -19,10 +26,12 @@
 
   box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.2);
   border-radius: 8px;
+
+  background-color: #fff;
 }
 
 .form h1 {
+  margin: 3% 0;
   margin-left: 5%;
-  margin-top: 3%;
   font-size: 2rem;
 }

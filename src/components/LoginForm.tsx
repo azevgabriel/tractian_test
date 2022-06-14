@@ -40,8 +40,8 @@ export const LoginForm = ({ className }: LoginFormProps) => {
   return (
     <Form
       name="basic"
-      labelCol={{ offset: 1, span: 5 }}
-      wrapperCol={{ span: 15 }}
+      labelCol={{ offset: 0, span: 5 }}
+      wrapperCol={{ span: 17 }}
       initialValues={{ remember: true }}
       onFinish={onFinish}
       autoComplete="off"
@@ -63,9 +63,9 @@ export const LoginForm = ({ className }: LoginFormProps) => {
       >
         <Input placeholder="Insira seu e-mail" />
       </Form.Item>
-      <Form.Item wrapperCol={{ offset: 18, span: 15 }}>
-        <Button type="primary" htmlType="submit">
-          Submit
+      <Form.Item wrapperCol={{ push: 18 }}>
+        <Button size="middle" type="primary" htmlType="submit">
+          Entrar
         </Button>
       </Form.Item>
     </Form>

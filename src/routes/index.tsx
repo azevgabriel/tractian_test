@@ -1,6 +1,5 @@
-import { useState } from 'react';
-
 import { useAuth } from '../hooks/auth';
+import { LogoutOutlined } from '@ant-design/icons';
 
 // ROUTES
 import { UserRoutes } from './user.routes';
@@ -10,18 +9,27 @@ import { AuthRoutes } from './auth.routes';
 import TractianIcon from '../assets/logo.svg';
 
 // ANTD
-import { Layout } from 'antd';
+import { Button, Layout } from 'antd';
 const { Header } = Layout;
 
 export const AppRoutes = () => {
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
 
   if (user)
     return (
       <Layout>
         <Header className="header">
           <img src={TractianIcon} alt="Logo da empresa Tractian" />
-          <h2>Bem vindo, {user.name}!</h2>
+          <div className="rightContentHeader">
+            <h2>Bem vindo, {user.name}!</h2>
+            <Button
+              size="large"
+              icon={<LogoutOutlined />}
+              onClick={() => signOut()}
+            >
+              Sair
+            </Button>
+          </div>
         </Header>
         <UserRoutes />
       </Layout>

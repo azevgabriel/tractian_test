@@ -7,6 +7,14 @@
   --color-button-hover: #1dc159;
   --color-warning: #ff9a1f;
   --color-problem: #ff2020;
+
+  overflow: hidden;
+}
+
+h1,
+h2,
+p {
+  margin: 0;
 }
 
 .header {
@@ -19,6 +27,19 @@
   display: flex;
   height: 80px;
   align-items: center;
+  justify-content: space-between;
+}
+
+.rightContentHeader {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.rightContentHeader h2 {
+  color: var(--color-text-white);
+  font-weight: bold;
+  margin-right: 2rem;
 }
 
 .header img {

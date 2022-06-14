@@ -12,7 +12,7 @@ interface ISpecifications {
   rpm?: number;
 }
 
-export interface ICompany {
+export interface IAsset {
   id: number;
   sensors: string[];
   model: string;
@@ -26,14 +26,14 @@ export interface ICompany {
   companyId: number;
 }
 
-export const getAssets = async (): Promise<ICompany[]> => {
+export const getAssets = async (): Promise<IAsset[]> => {
   const response = await api.get('/assets').catch((err) => {
     throw err;
   });
   return response.data;
 };
 
-export const getAsset = async (id: number): Promise<ICompany> => {
+export const getAsset = async (id: number): Promise<IAsset> => {
   const response = await api.get(`/assets/${id}`).catch((err) => {
     throw err;
   });
