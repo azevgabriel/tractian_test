@@ -6,6 +6,31 @@ import { Layout } from 'antd';
 const { Content } = Layout;
 
 export const Login = () => {
+  const returnCodeText = () => {
+    const tab = '\xA0\xA0';
+    const openKey = '{';
+    const closeKey = '}';
+    const openbracket = '[';
+    const closebracket = ']';
+
+    const code = ['', `${openbracket}`, `${tab + openKey}`];
+
+    for (let i = 1; i < 7; i++) {
+      let objectExample = [
+        `${tab + tab + `"id": ${i},`}`,
+        `${tab + tab + `"email": "teste${i}@tractian.com",`}`,
+        `${tab + tab + '...'}`,
+        `${tab + closeKey + `${i === 6 ? '' : ','}`}`,
+      ];
+
+      code.push(...objectExample);
+    }
+
+    code.push(`${closebracket}`);
+
+    return code;
+  };
+
   return (
     <Content className="content">
       <div className="codeArea">
@@ -18,68 +43,12 @@ export const Login = () => {
           // Method: GET <br />
           // https://my-json-server.typicode.com/tractian/fake-api/users
           <br />
-          <br /> &#91;
-          <br />
-          &nbsp;&nbsp;&#123;
-          <br />
-          &nbsp;&nbsp;&nbsp;&nbsp;"id": 1,
-          <br />
-          &nbsp;&nbsp;&nbsp;&nbsp;"email": teste1@tractian.com,
-          <br />
-          &nbsp;&nbsp;&nbsp;&nbsp;...
-          <br />
-          &nbsp;&nbsp;&#125;,
-          <br />
-          &nbsp;&nbsp;&#123;
-          <br />
-          &nbsp;&nbsp;&nbsp;&nbsp;"id": 2,
-          <br />
-          &nbsp;&nbsp;&nbsp;&nbsp;"email": teste1@tractian.com,
-          <br />
-          &nbsp;&nbsp;&nbsp;&nbsp;...
-          <br />
-          &nbsp;&nbsp;&#125;,
-          <br />
-          &nbsp;&nbsp;&#123;
-          <br />
-          &nbsp;&nbsp;&nbsp;&nbsp;"id": 3,
-          <br />
-          &nbsp;&nbsp;&nbsp;&nbsp;"email": teste1@tractian.com,
-          <br />
-          &nbsp;&nbsp;&nbsp;&nbsp;...
-          <br />
-          &nbsp;&nbsp;&#125;,
-          <br />
-          &nbsp;&nbsp;&#123;
-          <br />
-          &nbsp;&nbsp;&nbsp;&nbsp;"id": 4,
-          <br />
-          &nbsp;&nbsp;&nbsp;&nbsp;"email": teste1@tractian.com,
-          <br />
-          &nbsp;&nbsp;&nbsp;&nbsp;...
-          <br />
-          &nbsp;&nbsp;&#125;,
-          <br />
-          &nbsp;&nbsp;&#123;
-          <br />
-          &nbsp;&nbsp;&nbsp;&nbsp;"id": 5,
-          <br />
-          &nbsp;&nbsp;&nbsp;&nbsp;"email": teste1@tractian.com,
-          <br />
-          &nbsp;&nbsp;&nbsp;&nbsp;...
-          <br />
-          &nbsp;&nbsp;&#125;,
-          <br />
-          &nbsp;&nbsp;&#123;
-          <br />
-          &nbsp;&nbsp;&nbsp;&nbsp;"id": 6,
-          <br />
-          &nbsp;&nbsp;&nbsp;&nbsp;"email": teste1@tractian.com,
-          <br />
-          &nbsp;&nbsp;&nbsp;&nbsp;...
-          <br />
-          &nbsp;&nbsp;&#125;,
-          <br /> &#93;
+          {returnCodeText().map((line, index) => (
+            <>
+              <span key={index}>{line}</span>
+              <br />
+            </>
+          ))}
         </div>
         <p>
           Obs: O usuário entra sem nenhuma prioridade, entretando no canto

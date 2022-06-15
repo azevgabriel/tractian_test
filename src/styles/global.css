@@ -69,5 +69,4 @@ p {
 }
 ::-webkit-scrollbar-thumb {
   background-color: var(--color-primary);
-  border-radius: 4px;
 }
