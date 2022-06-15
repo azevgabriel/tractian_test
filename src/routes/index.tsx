@@ -21,11 +21,17 @@ export const AppRoutes = () => {
         <Header className="header">
           <img src={TractianIcon} alt="Logo da empresa Tractian" />
           <div className="rightContentHeader">
-            <h2>Bem vindo, {user.name}!</h2>
+            <p>
+              Bem vindo, <strong>{user.name}!</strong>
+            </p>
             <Button
+              type="link"
               size="large"
               icon={<LogoutOutlined />}
               onClick={() => signOut()}
+              style={{
+                color: '#eee',
+              }}
             >
               Sair
             </Button>

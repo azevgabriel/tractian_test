@@ -1,12 +1,18 @@
-import {
-  AppstoreOutlined,
-  MailOutlined,
-  SettingOutlined,
-} from '@ant-design/icons';
+import React from 'react';
+
 import type { MenuProps } from 'antd';
 import { Menu } from 'antd';
-import React, { useState } from 'react';
 
+// ASSETS
+import {
+  DeploymentUnitOutlined,
+  BranchesOutlined,
+  SettingOutlined,
+  UserOutlined,
+  FundViewOutlined,
+} from '@ant-design/icons';
+
+// CONFIG FOR ANTD MENU
 type MenuItem = Required<MenuProps>['items'][number];
 
 function getItem(
@@ -25,51 +31,65 @@ function getItem(
   } as MenuItem;
 }
 
-const items: MenuItem[] = [
-  getItem('Ativos do Testador', 'sub1', <MailOutlined />, [
-    getItem('Option 1', '1'),
-    getItem('Option 2', '2'),
-    getItem('Option 3', '3'),
-    getItem('Option 4', '4'),
+const userItems: MenuItem[] = [
+  getItem('Resumo', 'overview', <FundViewOutlined />),
+  getItem('Ativos', 'assets', <SettingOutlined />, [
+    getItem('Ativos da Unidade', 'assets-unit-filter'),
+    getItem('Ativos da Empresa', 'assets-company-filter'),
   ]),
-  getItem('Ativos da Unidade', 'sub4', <SettingOutlined />, [
-    getItem('Option 9', '9'),
-    getItem('Option 10', '10'),
-    getItem('Option 11', '11'),
-    getItem('Option 12', '12'),
+  getItem('Unidades', 'units', <BranchesOutlined />, [
+    getItem('Unidades da Empresa', 'units-company-filter'),
   ]),
-  getItem('Ativos da Empresa', 'sub2', <AppstoreOutlined />, [
-    getItem('Option 5', '5'),
-    getItem('Option 6', '6'),
-    getItem('Submenu', 'sub3', null, [
-      getItem('Option 7', '7'),
-      getItem('Option 8', '8'),
-    ]),
+  getItem('Usuários', 'users', <UserOutlined />, [
+    getItem('Usuários da Empresa', 'users-company-filter'),
   ]),
 ];
 
-// submenu keys of first level
-const rootSubmenuKeys = ['sub1', 'sub2', 'sub4'];
+const adminItems: MenuItem[] = [
+  getItem('Resumo', 'overview', <FundViewOutlined />),
+  getItem('Ativos', 'assets', <SettingOutlined />, [
+    getItem('Ativos da Unidade', 'assets-unit-filter'),
+    getItem('Ativos da Empresa', 'assets-company-filter'),
+    getItem('Todos os Ativos', 'assets-no-filter'),
+  ]),
+  getItem('Unidades', 'units', <BranchesOutlined />, [
+    getItem('Unidades da Empresa', 'units-company-filter'),
+    getItem('Todas as Unidades', 'units-no-filter'),
+  ]),
+  getItem('Usuários', 'users', <UserOutlined />, [
+    getItem('Usuários da Empresa', 'users-company-filter'),
+    getItem('Todos os Usuários', 'users-no-filter'),
+  ]),
+  getItem('Empresas', 'companies', <DeploymentUnitOutlined />, [
+    getItem('Todas as Empresas', 'companies-no-filter'),
+  ]),
+];
 
-export const MenuWrapper: React.FC = () => {
-  const [openKeys, setOpenKeys] = useState(['sub1']);
+// INTERFACES
+interface MenuWrapperProps {
+  isAdmin: boolean;
+  openKeys: string[];
+  onOpenChange: (openKeys: string[]) => void;
+  onSelect: MenuProps['onSelect'];
+  selectedKeys: string[];
+}
 
-  const onOpenChange: MenuProps['onOpenChange'] = (keys) => {
-    const latestOpenKey = keys.find((key) => openKeys.indexOf(key) === -1);
-    if (rootSubmenuKeys.indexOf(latestOpenKey!) === -1) {
-      setOpenKeys(keys);
-    } else {
-      setOpenKeys(latestOpenKey ? [latestOpenKey] : []);
-    }
-  };
-
+export const MenuWrapper: React.FC<MenuWrapperProps> = ({
+  isAdmin,
+  openKeys,
+  selectedKeys,
+  onOpenChange,
+  onSelect,
+}: MenuWrapperProps) => {
   return (
     <Menu
       mode="inline"
       openKeys={openKeys}
       onOpenChange={onOpenChange}
+      selectedKeys={selectedKeys}
+      onSelect={onSelect}
       style={{ width: 250 }}
-      items={items}
+      items={isAdmin ? adminItems : userItems}
       theme="dark"
     />
   );

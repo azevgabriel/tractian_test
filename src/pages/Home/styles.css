@@ -1,13 +1,13 @@
 .content {
   height: calc(100vh - 80px);
-  background-color: #e0e0e0;
+  background-color: var(--color-background-white);
 }
 
 .content div {
   height: 100%;
 }
 
-.content-left {
+.contentLeft {
   display: flex;
   flex-direction: column;
 
@@ -29,4 +29,10 @@
 .userDescription h1,
 .userDescription p {
   color: var(--color-text-white);
+}
+
+.topContentLeft {
+  display: flex;
+  flex-direction: column;
+  max-height: 95%;
 }

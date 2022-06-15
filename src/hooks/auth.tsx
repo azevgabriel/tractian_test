@@ -4,6 +4,7 @@ import {
   useContext,
   ReactNode,
   useState,
+  useEffect,
 } from 'react';
 import { IUser } from '../interfaces/User';
 import { api } from '../lib/api';
@@ -12,6 +13,7 @@ interface AuthContextData {
   signIn: (email: string) => Promise<void>;
   user: IUser | null;
   signOut: () => void;
+  changeTypeUser: (type: 'user' | 'admin') => void;
 }
 
 interface AuthProviderProps {
@@ -25,16 +27,44 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const signIn = useCallback(async (email: string) => {
     const getUsers = await api.get<IUser[]>('/users');
-    const user = getUsers.data.find((user) => user.email === email);
+    const userData = getUsers.data.find((user) => user.email === email);
 
-    if (!user) throw new Error('Usuário não encontrado');
+    if (!userData) throw new Error('Usuário não encontrado');
 
-    setUser(user);
+    const userWithType = {
+      ...userData,
+      type: 'user',
+    };
+
+    localStorage.setItem('@Tractian:USER', JSON.stringify(userWithType));
+    setUser(userWithType as IUser);
   }, []);
 
   const signOut = useCallback(() => {
+    localStorage.removeItem('@Tractian:USER');
     setUser(null);
   }, []);
+
+  const changeTypeUser = useCallback(
+    (type: 'admin' | 'user') => {
+      const userWithType = {
+        ...user,
+        type,
+      };
+      localStorage.setItem('@Tractian:USER', JSON.stringify(userWithType));
+      setUser(userWithType as IUser);
+    },
+    [user]
+  );
+
+  useEffect(() => {
+    const userString = localStorage.getItem('@Tractian:USER');
+    console.log(user);
+
+    if (userString && !user) {
+      setUser(JSON.parse(userString));
+    }
+  }, [user]);
 
   return (
     <AuthContext.Provider
@@ -42,6 +72,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
         signIn,
         signOut,
         user,
+        changeTypeUser,
       }}
     >
       {children}

@@ -1,12 +1,16 @@
 :root {
   --color-primary: #1e3a8a;
-  --color-secondary: #004dea;
+  --color-secondary: #344d95;
   --color-text-white: #fff;
   --color-text-black: #1f2937;
   --color-button: #1bb553;
   --color-button-hover: #1dc159;
   --color-warning: #ff9a1f;
   --color-problem: #ff2020;
+  --color-background-white: #ddd;
+  --color-background-black: #161b22;
+  --color-background-strongblack: #0d1117;
+  --color-text-code: #232324;
 
   overflow: hidden;
 }
@@ -36,13 +40,34 @@ p {
   align-items: center;
 }
 
-.rightContentHeader h2 {
+.rightContentHeader p {
+  font-size: 1.2rem;
   color: var(--color-text-white);
-  font-weight: bold;
-  margin-right: 2rem;
+  margin-right: 3rem;
 }
 
 .header img {
   height: 30%;
   width: auto;
+}
+
+.max-size-container {
+  display: flex;
+  width: 100%;
+  height: 100%;
+
+  align-items: center;
+  justify-content: center;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 2px;
+}
+::-webkit-scrollbar-track {
+  background-color: var(--color-background-white);
+}
+::-webkit-scrollbar-thumb {
+  background-color: var(--color-primary);
+  border-radius: 4px;
 }
