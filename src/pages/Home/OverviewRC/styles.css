@@ -1,24 +1,75 @@
-.halfScreen {
-  display: flex;
-  flex-direction: row;
-
-  height: 50%;
+.overviewRightContent {
   width: 100%;
+  height: 100%;
+  padding: 10px;
+
+  display: flex;
+  flex-direction: ROW;
+}
+
+.notificationsWrapper {
+  display: flex;
+  flex-direction: column;
+
+  height: 100%;
+  width: 40%;
+  padding: 0 15px;
+
+  overflow-y: auto;
+}
+
+.plotsWrapper {
+  display: flex;
+  flex-direction: column;
+
+  height: 100%;
+  width: 60%;
+  padding: 0 15px;
 }
 
 .halfLayout {
   display: flex;
+  flex-direction: column;
 
-  height: 100%;
-  width: 50%;
+  height: calc((100vh - 100px) / 2);
+  width: 100%;
+}
 
-  padding: 2.5%;
+.halfLayout h2 {
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+}
+
+.halfLayout:last-child h2 {
+  margin-top: 10px;
+}
+
+.notificationsWrapper h2 {
+  font-size: 1.2rem;
+  margin-bottom: 10px;
 }
 
 .g2-tooltip {
   max-height: 25%;
 }
 
+.pie .g2-tooltip {
+  max-height: 17%;
+}
+
 .g2-tooltip div {
+  height: max-content;
+}
+
+.alert {
+  max-height: 110px;
+  margin-bottom: 10px;
+}
+
+.alert:last-child {
+  margin-bottom: 0;
+}
+
+.alert div {
   height: max-content;
 }

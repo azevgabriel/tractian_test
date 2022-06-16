@@ -2,28 +2,45 @@ import './styles.css';
 
 import React, { useCallback, useEffect, useState } from 'react';
 import { Column, Pie, G2 } from '@ant-design/plots';
-import { Layout } from 'antd';
+import { Alert, Button, Layout } from 'antd';
 import { Content } from 'antd/lib/layout/layout';
 import { getAssets } from '../../../interfaces/Asset';
 import { useAuth } from '../../../hooks/auth';
+import { Datum } from '@ant-design/charts';
+import { Loading } from '../../../components/Loading';
 
-interface IDataTemp {
+interface IDataColumn {
   name: string;
-  maxTemp: number;
+  ativo: string;
+  data: number;
 }
 
-interface IDataStatus {
+interface IDataPie {
   status: string;
   count: number;
 }
 
+interface INotifications {
+  type: 'warning' | 'success' | 'error' | 'info';
+  title: string;
+  description: string;
+}
+
+const G = G2.getEngine('canvas');
+
 export const OverviewRightContent: React.FC = () => {
   const { user } = useAuth();
 
-  const [dataTemp, setDataTemp] = useState<IDataTemp[] | null>(null);
-  const [dataStatus, setDataStatus] = useState<IDataStatus[] | null>(null);
+  const [dataTemp, setDataTemp] = useState<IDataColumn[] | null>(null);
+  const [dataStatus, setDataStatus] = useState<IDataPie[] | null>(null);
+  const [dataNotifications, setDataNotifications] = useState<
+    INotifications[] | null
+  >(null);
+
+  const [loadingAsync, setLoadingAsync] = useState<'data' | 'none'>('none');
 
   const fetchData = useCallback(async () => {
+    setLoadingAsync('data');
     let assets = await getAssets();
 
     if (user?.type !== 'admin')
@@ -35,135 +52,164 @@ export const OverviewRightContent: React.FC = () => {
       (asset) => asset.status === 'inOperation'
     );
 
-    const dataStatus: IDataStatus[] = [
-      { status: 'inAlert', count: inAlert.length },
-      { status: 'inDowntime', count: inDowntime.length },
-      { status: 'inOperation', count: inOperation.length },
+    const dataStatus: IDataPie[] = [
+      { status: 'Em Alerta', count: inAlert.length },
+      { status: 'Em Manutenção', count: inDowntime.length },
+      { status: 'Em Operação', count: inOperation.length },
     ];
 
-    //only name and temp are needed
-    let dataTemp: IDataTemp[] = [];
+    let dataTemp: IDataColumn[] = [];
+    let sumTotalHealthy = 0;
     assets.forEach((asset) => {
-      if (asset.specifications.maxTemp)
-        dataTemp.push({
-          name: asset.name,
-          maxTemp: asset.specifications.maxTemp,
+      sumTotalHealthy = sumTotalHealthy + asset.healthscore;
+      dataTemp.push({
+        name: 'Healthscore',
+        ativo: asset.name,
+        data: asset.healthscore,
+      });
+    });
+
+    dataTemp.push({
+      name: 'Healthscore',
+      ativo: 'Média',
+      data: Number((sumTotalHealthy / assets.length).toFixed(0)),
+    });
+
+    const notifications: INotifications[] = [];
+    assets.forEach((asset) => {
+      if (asset.status === 'inAlert')
+        notifications.push({
+          type: 'warning',
+          title: 'Alerta de estado',
+          description: `${asset.name} está em Alerta`,
+        });
+      if (asset.status === 'inDowntime')
+        notifications.push({
+          type: 'info',
+          title: 'Informação de estado',
+          description: `${asset.name} está em Manutenção`,
         });
     });
 
     setDataTemp(dataTemp);
     setDataStatus(dataStatus);
+    setDataNotifications(notifications);
+
+    setLoadingAsync('none');
   }, [user]);
-
-  // const DemoPie = useCallback(() => {
-  //   const G = G2.getEngine('canvas');
-  //   const data = [
-  //     { status: 'inAlert', value: dataStatus?.[0]?.count || 0 },
-  //     { status: 'inDowntime', value: dataStatus?.[1]?.count || 0 },
-  //     { status: 'inOperation', value: dataStatus?.[2]?.count || 0 },
-  //   ];
-  //   const cfg = {
-  //     appendPadding: 10,
-  //     data,
-  //     angleField: 'value',
-  //     colorField: 'type',
-  //     radius: 0.75,
-  //     legend: false,
-  //     label: {
-  //       type: 'spider',
-  //       labelHeight: 40,
-  //       formatter: (data: any, mappingData: any) => {
-  //         const group = new G.Group({});
-  //         group.addShape({
-  //           type: 'circle',
-  //           attrs: {
-  //             x: 0,
-  //             y: 0,
-  //             width: 40,
-  //             height: 50,
-  //             r: 5,
-  //             fill: mappingData.color,
-  //           },
-  //         });
-  //         group.addShape({
-  //           type: 'text',
-  //           attrs: {
-  //             x: 10,
-  //             y: 8,
-  //             text: `${data.status}`,
-  //             fill: mappingData.color,
-  //           },
-  //         });
-  //         group.addShape({
-  //           type: 'text',
-  //           attrs: {
-  //             x: 0,
-  //             y: 25,
-  //             text: `${data.count * 100}`,
-  //             fill: 'rgba(0, 0, 0, 0.65)',
-  //             fontWeight: 700,
-  //           },
-  //         });
-  //         return group;
-  //       },
-  //     },
-  //     interactions: [
-  //       {
-  //         type: 'element-selected',
-  //       },
-  //       {
-  //         type: 'element-active',
-  //       },
-  //     ],
-  //   };
-  //   const config = cfg;
-
-  //   return <Pie {...config} />;
-  // }, [dataStatus]);
 
   useEffect(() => {
     if (!dataStatus && !dataTemp) fetchData();
   }, [dataStatus, dataTemp]);
 
   return (
-    <>
-      <Layout className="halfScreen">
-        <Content className="halfLayout"></Content>
-        <Content className="halfLayout">
-          <Column
-            data={dataTemp ? dataTemp : []}
-            xField="name"
-            yField="maxTemp"
-            seriesField="maxTemp"
-            color={({ maxTemp }) => {
-              if (parseInt(maxTemp) >= 0 && parseInt(maxTemp) <= 55) {
-                return '#ffd8bf';
-              } else if (parseInt(maxTemp) >= 56 && parseInt(maxTemp) <= 60) {
-                return '#ffbb96';
-              } else if (parseInt(maxTemp) >= 61 && parseInt(maxTemp) <= 65) {
-                return '#ff9c6e';
-              } else if (parseInt(maxTemp) >= 66 && parseInt(maxTemp) <= 70) {
-                return '#ff7a45';
-              } else if (parseInt(maxTemp) >= 71 && parseInt(maxTemp) <= 75) {
-                return '#fa541c';
-              } else {
-                return '#d4380d';
-              }
-            }}
-            legend={false}
-            xAxis={{
-              label: {
-                autoHide: true,
-                autoRotate: false,
-              },
-            }}
-          />
-        </Content>
-      </Layout>
-      <Layout className="halfScreen">
-        <Content className="halfLayout"></Content>
-        <Content className="halfLayout">{/* <DemoPie /> */}</Content>
-      </Layout>
-    </>
+    <Layout className="overviewRightContent">
+      {loadingAsync === 'data' ? (
+        <Loading size="large" />
+      ) : (
+        <>
+          <Layout className="plotsWrapper">
+            <Content className="halfLayout">
+              {dataTemp && (
+                <>
+                  <h2>Pontuação de saúde de ativos</h2>
+                  <Column
+                    data={dataTemp}
+                    xField="ativo"
+                    yField="data"
+                    seriesField="ativo"
+                    animation={false}
+                    color={(d: Datum) => {
+                      if (d.ativo === 'Média') return '#ffbb96';
+                      return '#00bcd4';
+                    }}
+                  />
+                </>
+              )}
+            </Content>
+            <Content className="halfLayout">
+              {dataStatus && (
+                <>
+                  <h2>Quantidade total de ativos em estados diferentes.</h2>
+                  <Pie
+                    data={dataStatus}
+                    className="pie"
+                    appendPadding={0}
+                    angleField="count"
+                    colorField="status"
+                    legend={false}
+                    radius={0.7}
+                    animation={false}
+                    color={(d: Datum) => {
+                      if (d.status === 'Em Alerta') return '#f5222d';
+                      if (d.status === 'Em Operação') return '#52c41a';
+                      else return '#1890ff';
+                    }}
+                    label={{
+                      type: 'spider',
+                      labelHeight: 40,
+                      formatter: (data: any, mappingData: any) => {
+                        const group = new G.Group({});
+                        group.addShape({
+                          type: 'circle',
+                          attrs: {
+                            x: 0,
+                            y: 0,
+                            width: 40,
+                            height: 50,
+                            r: 5,
+                            fill: mappingData.color,
+                          },
+                        });
+                        group.addShape({
+                          type: 'text',
+                          attrs: {
+                            x: 10,
+                            y: 8,
+                            text: `${data.status}`,
+                            fill: mappingData.color,
+                          },
+                        });
+                        group.addShape({
+                          type: 'text',
+                          attrs: {
+                            x: 0,
+                            y: 25,
+                            text: `Total: ${data.count}`,
+                            fill: 'rgba(0, 0, 0, 0.65)',
+                            fontWeight: 700,
+                          },
+                        });
+                        return group;
+                      },
+                    }}
+                  />
+                </>
+              )}
+            </Content>
+          </Layout>
+          <Layout className="notificationsWrapper">
+            <>
+              {dataNotifications && (
+                <>
+                  <h2>Notificações</h2>
+                  {dataNotifications.map((notification) => (
+                    <Alert
+                      className="alert"
+                      message={notification.title}
+                      showIcon
+                      description={notification.description}
+                      type={notification.type}
+                      closable
+                      action={<Button size="small">Detalhes</Button>}
+                    />
+                  ))}
+                </>
+              )}
+            </>
+          </Layout>
+        </>
+      )}
+    </Layout>
   );
 };

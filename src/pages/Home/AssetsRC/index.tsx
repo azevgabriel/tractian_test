@@ -13,12 +13,22 @@ import { useAuth } from '../../../hooks/auth';
 import { Loading } from '../../../components/Loading';
 
 // ATND
-import { Button, Popconfirm, Statistic, Table, Tag } from 'antd';
+import {
+  Button,
+  Popconfirm,
+  Statistic,
+  Table,
+  Tag,
+  Form,
+  Input,
+  Select,
+} from 'antd';
 import { ColumnsType, TablePaginationConfig } from 'antd/lib/table';
 import { FilterValue } from 'antd/lib/table/interface';
 
 // INTERFACES
 import { deleteAsset, getAssets, IAsset } from '../../../interfaces/Asset';
+import { ModalWrapper } from '../../../components/Modal';
 
 interface Params {
   pagination?: TablePaginationConfig;
@@ -37,6 +47,29 @@ export const AssetsRightContent = ({ filter }: AssetsRightContentProps) => {
     pageSize: 7,
     position: ['topLeft'],
   });
+
+  const [loadingModal, setLoadingModal] = useState(false);
+  const [visibleModal, setVisibleModal] = useState(false);
+  const [titleModal, setTitleModal] = useState('');
+  const [editData, setEditData] = useState<IAsset | null>(null);
+
+  const showModal = (title: string, record?: IAsset) => {
+    setTitleModal(title);
+    if (record) setEditData(record);
+    setVisibleModal(true);
+  };
+
+  const handleOkModal = () => {
+    setLoadingModal(true);
+    setTimeout(() => {
+      setLoadingModal(false);
+      setVisibleModal(false);
+    }, 3000);
+  };
+
+  const handleCancelModal = () => {
+    setVisibleModal(false);
+  };
 
   const fetchData = useCallback(async (params: Params) => {
     setLoading(true);
@@ -195,6 +228,7 @@ export const AssetsRightContent = ({ filter }: AssetsRightContentProps) => {
               type="default"
               disabled={user?.type === 'admin' ? false : true}
               style={{ marginRight: '10px' }}
+              onClick={() => showModal('Editar')}
             >
               Editar
             </Button>
@@ -228,10 +262,74 @@ export const AssetsRightContent = ({ filter }: AssetsRightContentProps) => {
         <Loading size="middle" />
       ) : (
         <>
+          <ModalWrapper
+            loading={loadingModal}
+            onCancel={handleCancelModal}
+            onOk={handleOkModal}
+            visible={visibleModal}
+            title={titleModal}
+          >
+            <Form
+              labelCol={{ span: 4 }}
+              wrapperCol={{ span: 14 }}
+              layout="horizontal"
+              initialValues={{ size: 'default' }}
+            >
+              <Form.Item
+                label="Nome"
+                name="name"
+                rules={[
+                  {
+                    required: true,
+                    type: 'string',
+                    message: 'Por favor, insira o nome do ativo',
+                  },
+                ]}
+              >
+                <Input />
+              </Form.Item>
+              <Form.Item
+                label="Modelo"
+                name="model"
+                rules={[
+                  {
+                    required: true,
+                    type: 'string',
+                    message: 'Por favor, insira o modelo do ativo',
+                  },
+                ]}
+              >
+                <Select>
+                  <Select.Option value="fan">Ventilador</Select.Option>
+                  <Select.Option value="motor">Motor</Select.Option>
+                </Select>
+              </Form.Item>
+              <Form.Item
+                label="Status"
+                name="status"
+                rules={[
+                  {
+                    required: true,
+                    type: 'string',
+                    message: 'Por favor, insira o status do ativo',
+                  },
+                ]}
+              >
+                <Select>
+                  <Select.Option value="inOperation">Em Operação</Select.Option>
+                  <Select.Option value="inAlert">Em Alerta</Select.Option>
+                  <Select.Option value="inDowncase">
+                    Em Manutenção
+                  </Select.Option>
+                </Select>
+              </Form.Item>
+            </Form>
+          </ModalWrapper>
           <Button
             type="primary"
             disabled={user?.type === 'admin' ? false : true}
             className="addButton"
+            onClick={() => showModal('Criando novo ativo')}
           >
             Criar novo ativo
           </Button>

@@ -134,7 +134,9 @@ export const Home = () => {
               position: 'relative',
               display: 'flex',
               flexDirection: 'column',
+              overflow: 'hidden',
             }}
+            className="contentRight"
           >
             {renderRightContent()}
           </Content>
