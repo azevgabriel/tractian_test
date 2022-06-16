@@ -35,13 +35,18 @@ export const Login = () => {
     <Content className="content">
       <div className="codeArea">
         <p>
-          Bem vindo! Para começar, utilize algum email dados pelo{' '}
+          Bem vindo! Para começar, utilize algum email dado pelo{' '}
           <a href="https://github.com/tractian/fake-api">Fake API</a> da
           Tractian.
         </p>
         <div className="code">
-          // Method: GET <br />
-          // https://my-json-server.typicode.com/tractian/fake-api/users
+          <span style={{ color: 'var(--color-text-code-comment)' }}>
+            // Method: GET
+          </span>
+          <br />
+          <span style={{ color: 'var(--color-text-code-comment)' }}>
+            // https://my-json-server.typicode.com/tractian/fake-api/users
+          </span>
           <br />
           {returnCodeText().map((line, index) => (
             <>
@@ -56,7 +61,9 @@ export const Login = () => {
           administrador.
         </p>
       </div>
-      <LoginForm className="form" />
+      <div className="loginArea">
+        <LoginForm className="form" />
+      </div>
     </Content>
   );
 };

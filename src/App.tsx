@@ -1,6 +1,8 @@
 import { ConfigProvider } from 'antd';
 import ptBR from 'antd/lib/locale/pt_BR';
+
 import 'antd/dist/antd.css';
+import '@ant-design/flowchart/dist/index.css';
 
 import { AppRoutes } from './routes';
 import { AppProvider } from './hooks';

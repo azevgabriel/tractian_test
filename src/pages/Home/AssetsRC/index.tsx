@@ -15,7 +15,7 @@ import { Loading } from '../../../components/Loading';
 // ATND
 import { Button, Popconfirm, Statistic, Table, Tag } from 'antd';
 import { ColumnsType, TablePaginationConfig } from 'antd/lib/table';
-import { FilterValue, SorterResult } from 'antd/lib/table/interface';
+import { FilterValue } from 'antd/lib/table/interface';
 
 // INTERFACES
 import { deleteAsset, getAssets, IAsset } from '../../../interfaces/Asset';

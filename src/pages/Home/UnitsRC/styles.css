@@ -1,0 +1,10 @@
+.addButton {
+  position: absolute;
+  top: 2.5%;
+  right: 2.5%;
+  z-index: 10;
+}
+
+.ant-pagination {
+  padding-left: 2.5%;
+}

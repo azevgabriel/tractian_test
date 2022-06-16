@@ -1,0 +1,24 @@
+.halfScreen {
+  display: flex;
+  flex-direction: row;
+
+  height: 50%;
+  width: 100%;
+}
+
+.halfLayout {
+  display: flex;
+
+  height: 100%;
+  width: 50%;
+
+  padding: 2.5%;
+}
+
+.g2-tooltip {
+  max-height: 25%;
+}
+
+.g2-tooltip div {
+  height: max-content;
+}

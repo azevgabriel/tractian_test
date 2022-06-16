@@ -37,11 +37,12 @@ const userItems: MenuItem[] = [
     getItem('Ativos da Unidade', 'assets-unit-filter'),
     getItem('Ativos da Empresa', 'assets-company-filter'),
   ]),
+  getItem('Usuários', 'users', <UserOutlined />, [
+    getItem('Usuários da Unidade', 'users-unit-filter'),
+    getItem('Usuários da Empresa', 'users-company-filter'),
+  ]),
   getItem('Unidades', 'units', <BranchesOutlined />, [
     getItem('Unidades da Empresa', 'units-company-filter'),
-  ]),
-  getItem('Usuários', 'users', <UserOutlined />, [
-    getItem('Usuários da Empresa', 'users-company-filter'),
   ]),
 ];
 
@@ -52,13 +53,14 @@ const adminItems: MenuItem[] = [
     getItem('Ativos da Empresa', 'assets-company-filter'),
     getItem('Todos os Ativos', 'assets-no-filter'),
   ]),
+  getItem('Usuários', 'users', <UserOutlined />, [
+    getItem('Usuários da Unidade', 'users-unit-filter'),
+    getItem('Usuários da Empresa', 'users-company-filter'),
+    getItem('Todos os Usuários', 'users-no-filter'),
+  ]),
   getItem('Unidades', 'units', <BranchesOutlined />, [
     getItem('Unidades da Empresa', 'units-company-filter'),
     getItem('Todas as Unidades', 'units-no-filter'),
-  ]),
-  getItem('Usuários', 'users', <UserOutlined />, [
-    getItem('Usuários da Empresa', 'users-company-filter'),
-    getItem('Todos os Usuários', 'users-no-filter'),
   ]),
   getItem('Empresas', 'companies', <DeploymentUnitOutlined />, [
     getItem('Todas as Empresas', 'companies-no-filter'),
@@ -88,7 +90,7 @@ export const MenuWrapper: React.FC<MenuWrapperProps> = ({
       onOpenChange={onOpenChange}
       selectedKeys={selectedKeys}
       onSelect={onSelect}
-      style={{ width: 250 }}
+      style={{ width: 250, marginTop: 5 }}
       items={isAdmin ? adminItems : userItems}
       theme="dark"
     />

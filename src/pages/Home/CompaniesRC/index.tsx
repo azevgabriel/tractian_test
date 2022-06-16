@@ -8,8 +8,9 @@ import { Loading } from '../../../components/Loading';
 
 // ATND
 import { Button, Popconfirm, Table } from 'antd';
-import { ColumnsType } from 'antd/lib/table';
+import { ColumnsType, TablePaginationConfig } from 'antd/lib/table';
 import { Header } from 'antd/lib/layout/layout';
+import { FilterValue } from 'antd/lib/table/interface';
 
 // INTERFACES
 import {
@@ -18,14 +19,43 @@ import {
   ICompany,
 } from '../../../interfaces/Company';
 
+interface Params {
+  pagination?: TablePaginationConfig;
+  total?: number;
+  filtersTable?: Record<string, FilterValue | null>;
+}
+
 export const CompaniesRightContent = ({}) => {
   const { user } = useAuth();
 
   const [data, setData] = useState<ICompany[] | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [pagination, setPagination] = useState<TablePaginationConfig>({
+    current: 1,
+    pageSize: 7,
+    position: ['topLeft'],
+  });
 
-  const fetchData = useCallback(async () => {
-    setData(await getCompanies());
+  const fetchData = useCallback(async (params: Params) => {
+    setLoading(true);
+    let companiesData = await getCompanies();
+    setData(companiesData);
+    setPagination({
+      ...params.pagination,
+      total: companiesData.length,
+    });
+    setLoading(false);
   }, []);
+
+  const handleTableChange = (
+    newPagination: TablePaginationConfig,
+    filters: Record<string, FilterValue | null>
+  ) => {
+    fetchData({
+      pagination: newPagination,
+      filtersTable: filters,
+    });
+  };
 
   const handleDelete = useCallback(async (id: number) => {
     try {
@@ -36,28 +66,6 @@ export const CompaniesRightContent = ({}) => {
       console.error('Company:DELETE', error);
     }
   }, []);
-
-  // TAGS ASSETS
-  // {
-  //   title: 'Tags',
-  //   key: 'tags',
-  //   dataIndex: 'tags',
-  //   render: (_, { tags }) => (
-  //     <>
-  //       {tags.map((tag) => {
-  //         let color = tag.length > 5 ? 'geekblue' : 'green';
-  //         if (tag === 'loser') {
-  //           color = 'volcano';
-  //         }
-  //         return (
-  //           <Tag color={color} key={tag}>
-  //             {tag.toUpperCase()}
-  //           </Tag>
-  //         );
-  //       })}
-  //     </>
-  //   ),
-  // },
 
   const columns: ColumnsType<ICompany> = [
     {
@@ -112,7 +120,7 @@ export const CompaniesRightContent = ({}) => {
   ];
 
   useEffect(() => {
-    fetchData();
+    fetchData({ pagination });
   }, []);
 
   return (
@@ -121,22 +129,21 @@ export const CompaniesRightContent = ({}) => {
         <Loading size="middle" />
       ) : (
         <>
-          <Header
-            style={{
-              backgroundColor: '#ddd',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'flex-end',
-            }}
+          <Button
+            type="primary"
+            disabled={user?.type === 'admin' ? false : true}
+            className="addButton"
           >
-            <Button
-              type="primary"
-              disabled={user?.type === 'admin' ? false : true}
-            >
-              Criar nova empresa
-            </Button>
-          </Header>
-          <Table columns={columns} dataSource={data} />
+            Criar nova empresa
+          </Button>
+          <Table
+            columns={columns}
+            rowKey={(record) => record.id}
+            dataSource={data}
+            pagination={pagination}
+            loading={loading}
+            onChange={handleTableChange}
+          />
         </>
       )}
     </>

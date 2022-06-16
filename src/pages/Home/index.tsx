@@ -33,8 +33,8 @@ export const Home = () => {
   const [unit, setUnit] = useState<IUnit | null>(null);
   const [company, setCompany] = useState<ICompany | null>(null);
 
-  const [openMenuItem, setOpenMenuItem] = useState(['assets']);
-  const [selectedMenuSubItem, setSelectedMenuSubItem] = useState('');
+  const [openMenuItem, setOpenMenuItem] = useState(['overview']);
+  const [selectedMenuSubItem, setSelectedMenuSubItem] = useState('overview');
 
   const onChangeMenuItem: MenuProps['onOpenChange'] = (keys) => {
     const latestOpenKey = keys.find((key) => openMenuItem.indexOf(key) === -1);
@@ -128,7 +128,14 @@ export const Home = () => {
               </Button>
             )}
           </Sider>
-          <Content style={{ height: '100%', position: 'relative' }}>
+          <Content
+            style={{
+              height: '100%',
+              position: 'relative',
+              display: 'flex',
+              flexDirection: 'column',
+            }}
+          >
             {renderRightContent()}
           </Content>
         </>

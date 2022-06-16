@@ -8,7 +8,6 @@
   height: calc(100vh - 80px);
 
   background-color: var(--color-background-white);
-  padding-right: 10%;
 }
 
 .codeArea {
@@ -23,6 +22,17 @@
   flex-direction: column;
 
   background-color: var(--color-background-strongblack);
+}
+
+.loginArea {
+  height: 100%;
+  width: 60%;
+
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
 }
 
 .code {
@@ -42,7 +52,8 @@
 
   justify-content: center;
 
-  width: 30%;
+  width: 60%;
+  max-width: 400px;
   height: max-content;
 
   box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.2);

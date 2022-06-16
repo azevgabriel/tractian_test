@@ -11,6 +11,7 @@
   --color-background-black: #161b22;
   --color-background-strongblack: #0d1117;
   --color-text-code: #232324;
+  --color-text-code-comment: #8e8e8e;
 
   overflow: hidden;
 }
