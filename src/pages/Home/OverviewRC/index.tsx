@@ -1,13 +1,22 @@
 import './styles.css';
 
 import React, { useCallback, useEffect, useState } from 'react';
+import { useAuth } from '../../../hooks/auth';
+import { useNavigate } from 'react-router-dom';
+
+// GLOBAL COMPONENTS
+import { Loading } from '../../../components/Loading';
+
+// AntD Charts
 import { Column, Pie, G2 } from '@ant-design/plots';
+import { Datum } from '@ant-design/charts';
+
+// AntD
 import { Alert, Button, Layout } from 'antd';
 import { Content } from 'antd/lib/layout/layout';
+
+// INTERFACES
 import { getAssets } from '../../../interfaces/Asset';
-import { useAuth } from '../../../hooks/auth';
-import { Datum } from '@ant-design/charts';
-import { Loading } from '../../../components/Loading';
 
 interface IDataColumn {
   name: string;
@@ -21,6 +30,7 @@ interface IDataPie {
 }
 
 interface INotifications {
+  idAsset: number;
   type: 'warning' | 'success' | 'error' | 'info';
   title: string;
   description: string;
@@ -30,6 +40,7 @@ const G = G2.getEngine('canvas');
 
 export const OverviewRightContent: React.FC = () => {
   const { user } = useAuth();
+  let navigate = useNavigate();
 
   const [dataTemp, setDataTemp] = useState<IDataColumn[] | null>(null);
   const [dataStatus, setDataStatus] = useState<IDataPie[] | null>(null);
@@ -79,12 +90,14 @@ export const OverviewRightContent: React.FC = () => {
     assets.forEach((asset) => {
       if (asset.status === 'inAlert')
         notifications.push({
+          idAsset: asset.id,
           type: 'warning',
           title: 'Alerta de estado',
           description: `${asset.name} está em Alerta`,
         });
       if (asset.status === 'inDowntime')
         notifications.push({
+          idAsset: asset.id,
           type: 'info',
           title: 'Informação de estado',
           description: `${asset.name} está em Manutenção`,
@@ -201,7 +214,16 @@ export const OverviewRightContent: React.FC = () => {
                       description={notification.description}
                       type={notification.type}
                       closable
-                      action={<Button size="small">Detalhes</Button>}
+                      action={
+                        <Button
+                          size="small"
+                          onClick={() => {
+                            navigate(`/ativo/${notification.idAsset}`);
+                          }}
+                        >
+                          Detalhes
+                        </Button>
+                      }
                     />
                   ))}
                 </>

@@ -2,6 +2,7 @@ import './styles.css';
 
 import { useCallback, useEffect, useState } from 'react';
 import { useAuth } from '../../../hooks/auth';
+import { useNavigate } from 'react-router-dom';
 
 // GLOBAL COMPONENTS
 import { Loading } from '../../../components/Loading';
@@ -43,6 +44,7 @@ interface Params {
 export const AssetsRightContent = ({ filter }: AssetsRightContentProps) => {
   const { user } = useAuth();
   const [form] = Form.useForm();
+  let navigate = useNavigate();
 
   const [data, setData] = useState<IAsset[] | null>(null);
   const [loading, setLoading] = useState(false);
@@ -315,7 +317,13 @@ export const AssetsRightContent = ({ filter }: AssetsRightContentProps) => {
       render: (_, record) => (
         <>
           <>
-            <Button type="primary" style={{ marginRight: '10px' }}>
+            <Button
+              type="primary"
+              style={{ marginRight: '10px' }}
+              onClick={() => {
+                navigate(`/ativo/${record.id}`);
+              }}
+            >
               Detalhes
             </Button>
             <Button
