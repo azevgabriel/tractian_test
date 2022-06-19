@@ -9,7 +9,7 @@
   <img src="https://img.shields.io/github/stars/azevgabriel/educacao_especial">
 </p>
 
-<img src="./src/assets/images/screenshot.png">
+<img src="./src/assets/screenshot.png">
 
 <h4 align="center">
 <i>"Construir uma aplicação que mostre todos os dados e ações possíveis que utilizam a API criada no desafio back-end."</i>
@@ -17,7 +17,7 @@
 
 ### 🤩 Acesso
 
-Acesso pelo link: [Tractian-Test](tractian-test.vercel.app)
+Acesso pelo link: [Tractian-Test](https://tractian-test.vercel.app/)
 
 ### 🗻 Pré-requisitos
 
