@@ -1,6 +1,6 @@
 import { api } from '../lib/api';
 
-interface IMetrics {
+export interface IMetrics {
   totalCollectsUptime: number;
   totalUptime: number;
   lastUptimeAt: string;

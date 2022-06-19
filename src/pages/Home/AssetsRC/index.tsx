@@ -1,16 +1,11 @@
 import './styles.css';
 
-export type FilterAssetsRC = 'no' | 'unit' | 'company';
-
-interface AssetsRightContentProps {
-  filter: FilterAssetsRC;
-}
-
 import { useCallback, useEffect, useState } from 'react';
 import { useAuth } from '../../../hooks/auth';
 
 // GLOBAL COMPONENTS
 import { Loading } from '../../../components/Loading';
+import { ModalWrapper } from '../../../components/Modal';
 
 // ATND
 import {
@@ -22,13 +17,21 @@ import {
   Form,
   Input,
   Select,
+  InputNumber,
 } from 'antd';
 import { ColumnsType, TablePaginationConfig } from 'antd/lib/table';
 import { FilterValue } from 'antd/lib/table/interface';
 
 // INTERFACES
-import { deleteAsset, getAssets, IAsset } from '../../../interfaces/Asset';
-import { ModalWrapper } from '../../../components/Modal';
+export type FilterAssetsRC = 'no' | 'unit' | 'company';
+
+import { getAssets, IAsset, IMetrics } from '../../../interfaces/Asset';
+import { getCompanies, ICompany } from '../../../interfaces/Company';
+import { getUnits, IUnit } from '../../../interfaces/Unit';
+
+interface AssetsRightContentProps {
+  filter: FilterAssetsRC;
+}
 
 interface Params {
   pagination?: TablePaginationConfig;
@@ -39,6 +42,7 @@ interface Params {
 
 export const AssetsRightContent = ({ filter }: AssetsRightContentProps) => {
   const { user } = useAuth();
+  const [form] = Form.useForm();
 
   const [data, setData] = useState<IAsset[] | null>(null);
   const [loading, setLoading] = useState(false);
@@ -51,85 +55,172 @@ export const AssetsRightContent = ({ filter }: AssetsRightContentProps) => {
   const [loadingModal, setLoadingModal] = useState(false);
   const [visibleModal, setVisibleModal] = useState(false);
   const [titleModal, setTitleModal] = useState('');
-  const [editData, setEditData] = useState<IAsset | null>(null);
+  const [companies, setCompanies] = useState<ICompany[] | null>(null);
+  const [units, setUnits] = useState<IUnit[] | null>(null);
+
+  const [editNumber, setEditNumber] = useState(-1);
+
+  const resetForm = useCallback(() => {
+    setEditNumber(-1);
+
+    form.setFieldsValue({
+      name: '',
+      healthscore: '',
+      image: '',
+      sensors: '',
+      maxTemp: '',
+      rpm: '',
+      power: '',
+      unitId: '',
+      companyId: '',
+    });
+  }, [form]);
 
   const showModal = (title: string, record?: IAsset) => {
     setTitleModal(title);
-    if (record) setEditData(record);
+    resetForm();
+
+    if (record) {
+      form.setFieldsValue({
+        name: record.name,
+        status: record.status,
+        model: record.model,
+        healthscore: record.healthscore,
+        image: record.image,
+        maxTemp: record.specifications.maxTemp,
+        rpm: record.specifications.rpm,
+        power: record.specifications.power,
+        unitId: record.unitId,
+        companyId: record.companyId,
+      });
+
+      setEditNumber(record.id);
+    }
+
     setVisibleModal(true);
   };
 
-  const handleOkModal = () => {
+  const handleOkModal = useCallback(async () => {
     setLoadingModal(true);
-    setTimeout(() => {
-      setLoadingModal(false);
+    try {
+      const values = await form.validateFields();
+
+      const lastId = data?.[data.length - 1]?.id;
+
+      const dataValues: IAsset = {
+        id: editNumber !== -1 ? editNumber : lastId ? lastId + 1 : 1,
+        name: values.name as string,
+        status: values.status as string,
+        model: values.model as string,
+        healthscore: values.healthscore as number,
+        image: values.image as string,
+        specifications: {
+          maxTemp: values.maxTemp as number,
+          rpm: values.rpm as number,
+          power: values.power as number,
+        },
+        unitId: values.unitId as number,
+        companyId: values.companyId as number,
+        sensors: [],
+        metrics: {} as IMetrics,
+      };
+
+      if (editNumber === -1) {
+        // await postAsset(dataValues);
+        if (data) {
+          let newData: IAsset[] = [...data];
+          newData.push(dataValues);
+          setData(newData);
+        }
+      } else {
+        // await putAsset(editNumber, dataValues);
+        if (data) {
+          const newData = data.filter((item) => item.id !== editNumber);
+          newData.push(dataValues);
+          setData(newData);
+        }
+      }
+
       setVisibleModal(false);
-    }, 3000);
-  };
+      setLoadingModal(false);
+    } catch (error) {
+      setLoadingModal(false);
+    }
+  }, [form, data, editNumber]);
 
   const handleCancelModal = () => {
     setVisibleModal(false);
   };
 
-  const fetchData = useCallback(async (params: Params) => {
-    setLoading(true);
-    let assetsData = await getAssets();
+  const fetchData = useCallback(
+    async (params: Params) => {
+      setLoading(true);
 
-    let filteredAssets: IAsset[] = [];
+      let assetsData: IAsset[] | null = data;
 
-    switch (params.filter) {
-      case 'no':
-        break;
-      case 'unit':
-        filteredAssets = assetsData.filter(
-          (asset) => asset.unitId === user?.unitId
-        );
-        assetsData = filteredAssets;
-        break;
-      case 'company':
-        filteredAssets = assetsData.filter(
-          (asset) => asset.companyId === user?.companyId
-        );
-        assetsData = filteredAssets;
-        break;
-      default:
-        break;
-    }
+      if (assetsData === null) assetsData = await getAssets();
+      if (companies === null) setCompanies(await getCompanies());
+      if (units === null) setUnits(await getUnits());
 
-    if (params.filtersTable?.model) {
-      let model = params.filtersTable?.model as string[];
+      let filteredAssets: IAsset[] = [];
 
-      for (let i = 0; i < model.length; i++) {
-        filteredAssets = [
-          ...filteredAssets,
-          ...assetsData.filter((asset) => asset.model === model[i]),
-        ];
+      switch (params.filter) {
+        case 'no':
+          break;
+        case 'unit':
+          filteredAssets = (await getAssets()).filter(
+            (asset) => asset.unitId === user?.unitId
+          );
+          assetsData = filteredAssets;
+          break;
+        case 'company':
+          filteredAssets = (await getAssets()).filter(
+            (asset) => asset.companyId === user?.companyId
+          );
+          assetsData = filteredAssets;
+          break;
+        default:
+          break;
       }
 
-      assetsData = filteredAssets;
-    }
+      if (params.filtersTable?.model) {
+        let model = params.filtersTable?.model as string[];
 
-    if (params.filtersTable?.status) {
-      let status = params.filtersTable?.status as string[];
-      filteredAssets = [];
+        for (let i = 0; i < model.length; i++) {
+          filteredAssets = [
+            ...filteredAssets,
+            ...assetsData.filter((asset) => asset.model === model[i]),
+          ];
+        }
 
-      for (let i = 0; i < status.length; i++) {
-        filteredAssets = [
-          ...filteredAssets,
-          ...assetsData.filter((asset) => asset.status === status[i]),
-        ];
+        assetsData = filteredAssets;
       }
 
-      assetsData = filteredAssets;
-    }
+      if (params.filtersTable?.status) {
+        let status = params.filtersTable?.status as string[];
+        filteredAssets = [];
 
-    setData(assetsData);
-    setPagination({
-      ...params.pagination,
-      total: assetsData.length,
-    });
-    setLoading(false);
-  }, []);
+        for (let i = 0; i < status.length; i++) {
+          filteredAssets = [
+            ...filteredAssets,
+            ...assetsData.filter((asset) => asset.status === status[i]),
+          ];
+        }
+
+        assetsData = filteredAssets;
+      }
+
+      assetsData = [...new Set(assetsData)];
+
+      setData(assetsData);
+      setPagination({
+        ...params.pagination,
+        total: assetsData.length,
+      });
+      setLoading(false);
+    },
+    [data, companies, units, user]
+  );
 
   const handleTableChange = (
     newPagination: TablePaginationConfig,
@@ -142,15 +233,18 @@ export const AssetsRightContent = ({ filter }: AssetsRightContentProps) => {
     });
   };
 
-  const handleDelete = useCallback(async (id: number) => {
-    try {
-      await deleteAsset(id);
-      const newData = data?.filter((company) => company.id !== id);
-      if (newData) setData(newData);
-    } catch (error) {
-      console.error('Company:DELETE', error);
-    }
-  }, []);
+  const handleDelete = useCallback(
+    async (id: number) => {
+      try {
+        // await deleteAsset(id);
+        const newData = data?.filter((asset) => asset.id !== id);
+        if (newData) setData(newData);
+      } catch (error) {
+        console.error('Company:DELETE', error);
+      }
+    },
+    [data]
+  );
 
   const columns: ColumnsType<IAsset> = [
     {
@@ -228,7 +322,7 @@ export const AssetsRightContent = ({ filter }: AssetsRightContentProps) => {
               type="default"
               disabled={user?.type === 'admin' ? false : true}
               style={{ marginRight: '10px' }}
-              onClick={() => showModal('Editar')}
+              onClick={() => showModal('Editar', record)}
             >
               Editar
             </Button>
@@ -268,12 +362,14 @@ export const AssetsRightContent = ({ filter }: AssetsRightContentProps) => {
             onOk={handleOkModal}
             visible={visibleModal}
             title={titleModal}
+            width={'600px'}
           >
             <Form
-              labelCol={{ span: 4 }}
-              wrapperCol={{ span: 14 }}
+              labelCol={{ span: 7 }}
+              wrapperCol={{ span: 17 }}
               layout="horizontal"
               initialValues={{ size: 'default' }}
+              form={form}
             >
               <Form.Item
                 label="Nome"
@@ -321,6 +417,88 @@ export const AssetsRightContent = ({ filter }: AssetsRightContentProps) => {
                   <Select.Option value="inDowncase">
                     Em Manutenção
                   </Select.Option>
+                </Select>
+              </Form.Item>
+              <Form.Item
+                label="Pontuaçâo de saúde"
+                name="healthscore"
+                rules={[
+                  {
+                    required: true,
+                    type: 'number',
+                    message: 'Por favor, insira a pontuação de saúde do ativo',
+                  },
+                  {
+                    type: 'number',
+                    max: 100,
+                    message: 'Máximo de 100 pontos',
+                  },
+                  {
+                    type: 'number',
+                    min: 0,
+                    message: 'Mínimo de 0 pontos',
+                  },
+                ]}
+              >
+                <InputNumber />
+              </Form.Item>
+              <Form.Item
+                label="Temp. Máx."
+                name="maxTemp"
+                rules={[
+                  {
+                    required: true,
+                    type: 'number',
+                    message: 'Por favor, insira a temperatura máxima',
+                  },
+                ]}
+              >
+                <InputNumber />
+              </Form.Item>
+              <Form.Item label="Potência" name="power">
+                <Input />
+              </Form.Item>
+              <Form.Item label="RPM" name="rpm">
+                <Input />
+              </Form.Item>
+              <Form.Item
+                label="Unidade"
+                name="unitId"
+                rules={[
+                  {
+                    required: true,
+                    type: 'number',
+                    message: 'Por favor, insira a unidade do ativo.',
+                  },
+                ]}
+              >
+                <Select>
+                  {units &&
+                    units.map((unit) => (
+                      <Select.Option key={unit.id} value={unit.id}>
+                        {unit.name}
+                      </Select.Option>
+                    ))}
+                </Select>
+              </Form.Item>
+              <Form.Item
+                label="Empresa"
+                name="companyId"
+                rules={[
+                  {
+                    required: true,
+                    type: 'number',
+                    message: 'Por favor, insira o empresa do ativo',
+                  },
+                ]}
+              >
+                <Select>
+                  {companies &&
+                    companies.map((company) => (
+                      <Select.Option key={company.id} value={company.id}>
+                        {company.name}
+                      </Select.Option>
+                    ))}
                 </Select>
               </Form.Item>
             </Form>

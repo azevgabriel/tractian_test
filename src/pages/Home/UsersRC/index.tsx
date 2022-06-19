@@ -1,24 +1,27 @@
 import './styles.css';
 
-export type FilterUsersRC = 'no' | 'unit' | 'company';
-
-interface UsersRightContentProps {
-  filter: FilterUsersRC;
-}
-
 import { useCallback, useEffect, useState } from 'react';
 import { useAuth } from '../../../hooks/auth';
 
 // GLOBAL COMPONENTS
 import { Loading } from '../../../components/Loading';
+import { ModalWrapper } from '../../../components/Modal';
 
 // ATND
-import { Button, Popconfirm, Statistic, Table, Tag } from 'antd';
+import { Button, Form, Input, Popconfirm, Select, Table } from 'antd';
 import { ColumnsType, TablePaginationConfig } from 'antd/lib/table';
 import { FilterValue } from 'antd/lib/table/interface';
 
 // INTERFACES
+export type FilterUsersRC = 'no' | 'unit' | 'company';
+
 import { deleteUser, getUsers, IUser } from '../../../interfaces/User';
+import { getCompanies, ICompany } from '../../../interfaces/Company';
+import { getUnits, IUnit } from '../../../interfaces/Unit';
+
+interface UsersRightContentProps {
+  filter: FilterUsersRC;
+}
 
 interface Params {
   pagination?: TablePaginationConfig;
@@ -29,6 +32,7 @@ interface Params {
 
 export const UsersRightContent = ({ filter }: UsersRightContentProps) => {
   const { user } = useAuth();
+  const [form] = Form.useForm();
 
   const [data, setData] = useState<IUser[] | null>(null);
   const [loading, setLoading] = useState(false);
@@ -38,38 +42,126 @@ export const UsersRightContent = ({ filter }: UsersRightContentProps) => {
     position: ['topLeft'],
   });
 
-  const fetchData = useCallback(async (params: Params) => {
-    setLoading(true);
-    let usersData = await getUsers();
+  const [loadingModal, setLoadingModal] = useState(false);
+  const [visibleModal, setVisibleModal] = useState(false);
+  const [titleModal, setTitleModal] = useState('');
+  const [companies, setCompanies] = useState<ICompany[] | null>(null);
+  const [units, setUnits] = useState<IUnit[] | null>(null);
 
-    let filteredUsers: IUser[] = [];
+  const [editNumber, setEditNumber] = useState(-1);
 
-    switch (params.filter) {
-      case 'no':
-        break;
-      case 'company':
-        filteredUsers = usersData.filter(
-          (userData) => userData.companyId === user?.companyId
-        );
-        usersData = filteredUsers;
-        break;
-      case 'unit':
-        filteredUsers = usersData.filter(
-          (userData) => userData.unitId === user?.unitId
-        );
-        usersData = filteredUsers;
-        break;
-      default:
-        break;
+  const resetForm = useCallback(() => {
+    setEditNumber(-1);
+
+    form.setFieldsValue({
+      name: '',
+      email: '',
+      unitId: '',
+      companyId: '',
+    });
+  }, [form]);
+
+  const showModal = (title: string, record?: IUser) => {
+    setTitleModal(title);
+    resetForm();
+
+    if (record) {
+      form.setFieldsValue({
+        name: record.name,
+        email: record.email,
+        unitId: record.unitId,
+        companyId: record.companyId,
+      });
+
+      setEditNumber(record.id);
     }
 
-    setData(usersData);
-    setPagination({
-      ...params.pagination,
-      total: usersData.length,
-    });
-    setLoading(false);
-  }, []);
+    setVisibleModal(true);
+  };
+
+  const handleOkModal = useCallback(async () => {
+    setLoadingModal(true);
+    try {
+      const values = await form.validateFields();
+
+      const lastId = data?.[data.length - 1]?.id;
+
+      const dataValues: IUser = {
+        id: editNumber !== -1 ? editNumber : lastId ? lastId + 1 : 1,
+        name: values.name as string,
+        email: values.email as string,
+        unitId: values.unitId as number,
+        companyId: values.companyId as number,
+        type: 'user',
+      };
+
+      if (editNumber === -1) {
+        // await postUser(dataValues);
+        if (data) {
+          let newData: IUser[] = [...data];
+          newData.push(dataValues);
+          setData(newData);
+        }
+      } else {
+        // await putUser(editNumber, dataValues);
+        if (data) {
+          const newData = data.filter((item) => item.id !== editNumber);
+          newData.push(dataValues);
+          setData(newData);
+        }
+      }
+
+      setVisibleModal(false);
+      setLoadingModal(false);
+    } catch (error) {
+      setLoadingModal(false);
+    }
+  }, [form, data, editNumber]);
+
+  const handleCancelModal = () => {
+    setVisibleModal(false);
+  };
+
+  const fetchData = useCallback(
+    async (params: Params) => {
+      setLoading(true);
+
+      let usersData: IUser[] | null = data;
+
+      if (usersData === null) usersData = await getUsers();
+      if (companies === null) setCompanies(await getCompanies());
+      if (units === null) setUnits(await getUnits());
+
+      let filteredUsers: IUser[] = [];
+
+      switch (params.filter) {
+        case 'no':
+          break;
+        case 'company':
+          filteredUsers = usersData.filter(
+            (userData) => userData.companyId === user?.companyId
+          );
+          usersData = filteredUsers;
+          break;
+        case 'unit':
+          filteredUsers = usersData.filter(
+            (userData) => userData.unitId === user?.unitId
+          );
+          usersData = filteredUsers;
+          break;
+        default:
+          break;
+      }
+
+      setData(usersData);
+      setPagination({
+        ...params.pagination,
+        total: usersData.length,
+      });
+      setLoading(false);
+    },
+    [user, data]
+  );
 
   const handleTableChange = (
     newPagination: TablePaginationConfig,
@@ -103,7 +195,7 @@ export const UsersRightContent = ({ filter }: UsersRightContentProps) => {
       title: 'Nome da unidade',
       dataIndex: 'name',
       key: 'name',
-      width: '25%',
+      width: '20%',
       sorter: (a, b) => {
         if (a.name < b.name) return -1;
         if (a.name > b.name) return 1;
@@ -114,7 +206,7 @@ export const UsersRightContent = ({ filter }: UsersRightContentProps) => {
       title: 'E-mail',
       dataIndex: 'email',
       key: 'email',
-      width: '25%',
+      width: '20%',
       sorter: (a, b) => {
         if (a.name < b.name) return -1;
         if (a.name > b.name) return 1;
@@ -125,13 +217,13 @@ export const UsersRightContent = ({ filter }: UsersRightContentProps) => {
       title: 'ID da Unidade',
       dataIndex: 'unitId',
       key: 'unitId',
-      width: '10%',
+      width: '15%',
     },
     {
       title: 'ID da Empresa',
       dataIndex: 'companyId',
       key: 'companyId',
-      width: '10%',
+      width: '15%',
     },
     {
       title: 'Ação',
@@ -144,6 +236,7 @@ export const UsersRightContent = ({ filter }: UsersRightContentProps) => {
               type="default"
               disabled={user?.type === 'admin' ? false : true}
               style={{ marginRight: '10px' }}
+              onClick={() => showModal('Editar', record)}
             >
               Editar
             </Button>
@@ -177,10 +270,94 @@ export const UsersRightContent = ({ filter }: UsersRightContentProps) => {
         <Loading size="middle" />
       ) : (
         <>
+          <ModalWrapper
+            loading={loadingModal}
+            onCancel={handleCancelModal}
+            onOk={handleOkModal}
+            visible={visibleModal}
+            title={titleModal}
+            width={'600px'}
+          >
+            <Form
+              labelCol={{ span: 7 }}
+              wrapperCol={{ span: 17 }}
+              layout="horizontal"
+              initialValues={{ size: 'default' }}
+              form={form}
+            >
+              <Form.Item
+                label="Nome"
+                name="name"
+                rules={[
+                  {
+                    required: true,
+                    type: 'string',
+                    message: 'Por favor, insira o nome do ativo',
+                  },
+                ]}
+              >
+                <Input />
+              </Form.Item>
+              <Form.Item
+                label="E-mail"
+                name="email"
+                rules={[
+                  {
+                    required: true,
+                    type: 'email',
+                    message: 'Por favor, insira o email do usuário',
+                  },
+                ]}
+              >
+                <Input />
+              </Form.Item>
+              <Form.Item
+                label="Unidade"
+                name="unitId"
+                rules={[
+                  {
+                    required: true,
+                    type: 'number',
+                    message: 'Por favor, insira a unidade do usuário.',
+                  },
+                ]}
+              >
+                <Select>
+                  {units &&
+                    units.map((unit) => (
+                      <Select.Option key={unit.id} value={unit.id}>
+                        {unit.name}
+                      </Select.Option>
+                    ))}
+                </Select>
+              </Form.Item>
+              <Form.Item
+                label="Empresa"
+                name="companyId"
+                rules={[
+                  {
+                    required: true,
+                    type: 'number',
+                    message: 'Por favor, insira o empresa do ativo',
+                  },
+                ]}
+              >
+                <Select>
+                  {companies &&
+                    companies.map((company) => (
+                      <Select.Option key={company.id} value={company.id}>
+                        {company.name}
+                      </Select.Option>
+                    ))}
+                </Select>
+              </Form.Item>
+            </Form>
+          </ModalWrapper>
           <Button
             type="primary"
             disabled={user?.type === 'admin' ? false : true}
             className="addButton"
+            onClick={() => showModal('Adicionar um novo usuário')}
           >
             Criar novo usuário
           </Button>

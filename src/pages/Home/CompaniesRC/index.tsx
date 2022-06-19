@@ -7,17 +7,13 @@ import { useAuth } from '../../../hooks/auth';
 import { Loading } from '../../../components/Loading';
 
 // ATND
-import { Button, Popconfirm, Table } from 'antd';
+import { Button, Form, Input, Popconfirm, Table } from 'antd';
 import { ColumnsType, TablePaginationConfig } from 'antd/lib/table';
-import { Header } from 'antd/lib/layout/layout';
 import { FilterValue } from 'antd/lib/table/interface';
 
 // INTERFACES
-import {
-  deleteCompany,
-  getCompanies,
-  ICompany,
-} from '../../../interfaces/Company';
+import { getCompanies, ICompany } from '../../../interfaces/Company';
+import { ModalWrapper } from '../../../components/Modal';
 
 interface Params {
   pagination?: TablePaginationConfig;
@@ -27,6 +23,7 @@ interface Params {
 
 export const CompaniesRightContent = ({}) => {
   const { user } = useAuth();
+  const [form] = Form.useForm();
 
   const [data, setData] = useState<ICompany[] | null>(null);
   const [loading, setLoading] = useState(false);
@@ -36,16 +33,91 @@ export const CompaniesRightContent = ({}) => {
     position: ['topLeft'],
   });
 
-  const fetchData = useCallback(async (params: Params) => {
-    setLoading(true);
-    let companiesData = await getCompanies();
-    setData(companiesData);
-    setPagination({
-      ...params.pagination,
-      total: companiesData.length,
+  const [loadingModal, setLoadingModal] = useState(false);
+  const [visibleModal, setVisibleModal] = useState(false);
+  const [titleModal, setTitleModal] = useState('');
+
+  const [editNumber, setEditNumber] = useState(-1);
+
+  const resetForm = useCallback(() => {
+    setEditNumber(-1);
+
+    form.setFieldsValue({
+      name: '',
     });
-    setLoading(false);
-  }, []);
+  }, [form]);
+
+  const showModal = (title: string, record?: ICompany) => {
+    setTitleModal(title);
+    resetForm();
+
+    if (record) {
+      form.setFieldsValue({
+        name: record.name,
+      });
+
+      setEditNumber(record.id);
+    }
+
+    setVisibleModal(true);
+  };
+
+  const handleOkModal = useCallback(async () => {
+    setLoadingModal(true);
+    try {
+      const values = await form.validateFields();
+
+      const lastId = data?.[data.length - 1]?.id;
+
+      const dataValues: ICompany = {
+        id: editNumber !== -1 ? editNumber : lastId ? lastId + 1 : 1,
+        name: values.name as string,
+      };
+
+      if (editNumber === -1) {
+        // await postCompany(dataValues);
+        if (data) {
+          let newData: ICompany[] = [...data];
+          newData.push(dataValues);
+          setData(newData);
+        }
+      } else {
+        // await putCompany(editNumber, dataValues);
+        if (data) {
+          const newData = data.filter((item) => item.id !== editNumber);
+          newData.push(dataValues);
+          setData(newData);
+        }
+      }
+
+      setVisibleModal(false);
+      setLoadingModal(false);
+    } catch (error) {
+      setLoadingModal(false);
+    }
+  }, [form, data, editNumber]);
+
+  const handleCancelModal = () => {
+    setVisibleModal(false);
+  };
+
+  const fetchData = useCallback(
+    async (params: Params) => {
+      setLoading(true);
+
+      let companiesData: ICompany[] | null = data;
+
+      if (companiesData === null) companiesData = await getCompanies();
+
+      setData(companiesData);
+      setPagination({
+        ...params.pagination,
+        total: companiesData.length,
+      });
+      setLoading(false);
+    },
+    [data]
+  );
 
   const handleTableChange = (
     newPagination: TablePaginationConfig,
@@ -59,7 +131,7 @@ export const CompaniesRightContent = ({}) => {
 
   const handleDelete = useCallback(async (id: number) => {
     try {
-      await deleteCompany(id);
+      // await deleteCompany(id);
       const newData = data?.filter((company) => company.id !== id);
       if (newData) setData(newData);
     } catch (error) {
@@ -96,6 +168,7 @@ export const CompaniesRightContent = ({}) => {
               type="default"
               disabled={user?.type === 'admin' ? false : true}
               style={{ marginRight: '10px' }}
+              onClick={() => showModal('Editar', record)}
             >
               Editar
             </Button>
@@ -129,10 +202,41 @@ export const CompaniesRightContent = ({}) => {
         <Loading size="middle" />
       ) : (
         <>
+          <ModalWrapper
+            loading={loadingModal}
+            onCancel={handleCancelModal}
+            onOk={handleOkModal}
+            visible={visibleModal}
+            title={titleModal}
+            width={'600px'}
+          >
+            <Form
+              labelCol={{ span: 7 }}
+              wrapperCol={{ span: 17 }}
+              layout="horizontal"
+              initialValues={{ size: 'default' }}
+              form={form}
+            >
+              <Form.Item
+                label="Nome"
+                name="name"
+                rules={[
+                  {
+                    required: true,
+                    type: 'string',
+                    message: 'Por favor, insira o nome da empresa',
+                  },
+                ]}
+              >
+                <Input />
+              </Form.Item>
+            </Form>
+          </ModalWrapper>
           <Button
             type="primary"
             disabled={user?.type === 'admin' ? false : true}
             className="addButton"
+            onClick={() => showModal('Adicionar empresa')}
           >
             Criar nova empresa
           </Button>

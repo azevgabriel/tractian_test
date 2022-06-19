@@ -8,6 +8,7 @@ interface ModalProps {
   onCancel: () => void;
   onOk: () => void;
   title: string;
+  width: string;
 }
 
 export const ModalWrapper: React.FC<ModalProps> = ({
@@ -17,9 +18,11 @@ export const ModalWrapper: React.FC<ModalProps> = ({
   onOk,
   onCancel,
   title,
+  width = '500px',
 }: ModalProps) => {
   return (
     <Modal
+      width={width}
       visible={visible}
       title={title}
       onOk={onOk}
@@ -28,7 +31,13 @@ export const ModalWrapper: React.FC<ModalProps> = ({
         <Button key="back" onClick={onCancel}>
           Cancelar
         </Button>,
-        <Button key="submit" type="primary" loading={loading} onClick={onOk}>
+        <Button
+          key="submit"
+          type="primary"
+          htmlType="submit"
+          loading={loading}
+          onClick={onOk}
+        >
           Enviar
         </Button>,
       ]}
