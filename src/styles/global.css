@@ -83,9 +83,3 @@ p {
     display: none;
   }
 }
-
-@media (max-width: 575px) {
-  .ant-form .ant-form-item {
-    flex-wrap: none;
-  }
-}
