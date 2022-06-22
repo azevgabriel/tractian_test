@@ -8,11 +8,13 @@
   height: calc(100vh - 80px);
 
   background-color: var(--color-background-white);
+
+  overflow: hidden;
 }
 
 .codeArea {
   height: 100%;
-  width: 60%;
+  width: 50%;
   padding: 2rem;
 
   font-family: Fira Code;
@@ -26,7 +28,7 @@
 
 .loginArea {
   height: 100%;
-  width: 60%;
+  width: 50%;
 
   display: flex;
   flex-direction: column;
@@ -52,7 +54,7 @@
 
   justify-content: center;
 
-  width: 60%;
+  width: 70%;
   max-width: 400px;
   height: max-content;
 
@@ -66,4 +68,29 @@
   margin: 3% 0;
   margin-left: 5%;
   font-size: 2rem;
+}
+
+@media (max-width: 1005px) {
+  .codeArea {
+    display: none;
+  }
+  .loginArea {
+    width: 100%;
+  }
+  .form {
+    width: 90%;
+  }
+}
+
+@media (max-width: 575px) {
+  .form .ant-form-item {
+    flex-wrap: nowrap;
+    padding: 0 5%;
+  }
+  .form .ant-col-5 {
+    max-width: 30% !important;
+  }
+  .form .ant-col-17 {
+    max-width: 70% !important;
+  }
 }

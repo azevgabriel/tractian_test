@@ -4,7 +4,7 @@
   padding: 10px;
 
   display: flex;
-  flex-direction: ROW;
+  flex-direction: row;
 }
 
 .notificationsWrapper {
@@ -12,7 +12,7 @@
   flex-direction: column;
 
   height: 100%;
-  width: 40%;
+  width: 45%;
   padding: 0 15px;
 
   overflow-y: auto;
@@ -23,7 +23,7 @@
   flex-direction: column;
 
   height: 100%;
-  width: 60%;
+  width: 55%;
   padding: 0 15px;
 }
 
@@ -31,7 +31,7 @@
   display: flex;
   flex-direction: column;
 
-  height: calc((100vh - 100px) / 2);
+  height: calc((100vh - 200px) / 2);
   width: 100%;
 }
 
@@ -62,7 +62,7 @@
 }
 
 .alert {
-  max-height: 110px;
+  max-height: 130px;
   margin-bottom: 10px;
 }
 
@@ -72,4 +72,13 @@
 
 .alert div {
   height: max-content;
+}
+
+@media (max-width: 1000px) {
+  .notificationsWrapper {
+    display: none;
+  }
+  .plotsWrapper {
+    width: 100%;
+  }
 }

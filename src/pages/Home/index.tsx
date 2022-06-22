@@ -5,6 +5,7 @@ import { useAuth } from '../../hooks/auth';
 
 // ANT-D
 import { Layout, Button, MenuProps } from 'antd';
+import { MenuOutlined } from '@ant-design/icons';
 const { Content, Sider } = Layout;
 const rootSubmenuKeys = ['assets', 'units', 'users', 'companies', 'overview'];
 
@@ -35,6 +36,8 @@ export const Home = () => {
 
   const [openMenuItem, setOpenMenuItem] = useState(['overview']);
   const [selectedMenuSubItem, setSelectedMenuSubItem] = useState('overview');
+
+  const [openMenuMobile, setOpenMenuMobile] = useState(false);
 
   const onChangeMenuItem: MenuProps['onOpenChange'] = (keys) => {
     const latestOpenKey = keys.find((key) => openMenuItem.indexOf(key) === -1);
@@ -95,7 +98,27 @@ export const Home = () => {
         <Loading size="large" />
       ) : (
         <>
-          <Sider width={250} className="contentLeft">
+          <Button
+            className="buttonContentLeft-mobile"
+            onClick={() => setOpenMenuMobile((oldValue) => !oldValue)}
+            type="link"
+          >
+            <MenuOutlined />
+          </Button>
+          {openMenuMobile && (
+            <div className="contentLeft-mobile">
+              <MenuWrapper
+                isAdmin={user?.type === 'admin' ? true : false}
+                onOpenChange={onChangeMenuItem}
+                onSelect={onSelectMenuSubItem}
+                openKeys={openMenuItem}
+                selectedKeys={[selectedMenuSubItem]}
+                key={`menu${user?.type === 'admin' ? '-admin' : '-user'}`}
+              />
+            </div>
+          )}
+
+          <Sider width={'20%'} className="contentLeft">
             <div className="topContentLeft">
               <span className="userDescription">
                 <h1>Empresa:</h1>
@@ -131,6 +154,7 @@ export const Home = () => {
           <Content
             style={{
               height: '100%',
+              width: '80%',
               position: 'relative',
               display: 'flex',
               flexDirection: 'column',

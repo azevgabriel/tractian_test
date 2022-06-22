@@ -1,4 +1,4 @@
-.content {
+.contentDetailAsset {
   height: calc(100vh - 80px);
   background-color: var(--color-background-white);
 
@@ -6,7 +6,7 @@
   flex-direction: row;
 }
 
-.content img {
+.contentDetailAsset img {
   width: 50%;
   height: 100%;
   object-fit: cover;
@@ -14,4 +14,18 @@
 
 .description {
   padding: 0 10px;
+}
+
+@media (max-width: 1000px) {
+  .contentDetailAsset {
+    flex-direction: column;
+    overflow-y: auto;
+  }
+
+  .contentDetailAsset img {
+    width: 100%;
+    height: auto;
+    margin: 0 auto;
+    margin-bottom: 10px;
+  }
 }

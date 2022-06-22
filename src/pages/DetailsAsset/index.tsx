@@ -39,13 +39,25 @@ export const DetailsAsset = () => {
   }, []);
 
   return (
-    <Layout className="content">
+    <Layout className="contentDetailAsset">
       {asset === null ? (
         <Loading size="large" />
       ) : (
         <>
           <img src={asset.image} alt={asset.name} />
+
           <Content className="description">
+            <Button
+              style={{ margin: '1% 0', width: '100%' }}
+              type="primary"
+              size="large"
+              block
+              onClick={() => {
+                navigate(`/asset/${asset.id}/collect`);
+              }}
+            >
+              Voltar para página inicial
+            </Button>
             <Descriptions title="Informações do Ativo" bordered>
               <Descriptions.Item label="Nome:" span={3}>
                 {asset.name}
@@ -96,15 +108,6 @@ export const DetailsAsset = () => {
                 <Progress percent={asset.healthscore} />
               </Descriptions.Item>
             </Descriptions>
-            <Button
-              type="primary"
-              block
-              onClick={() => {
-                navigate(`/asset/${asset.id}/collect`);
-              }}
-            >
-              Voltar para página inicial
-            </Button>
           </Content>
         </>
       )}

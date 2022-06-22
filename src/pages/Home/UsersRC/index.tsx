@@ -190,6 +190,7 @@ export const UsersRightContent = ({ filter }: UsersRightContentProps) => {
       dataIndex: 'id',
       key: 'id',
       width: '10%',
+      responsive: ['lg'],
     },
     {
       title: 'Nome da unidade',
@@ -218,12 +219,14 @@ export const UsersRightContent = ({ filter }: UsersRightContentProps) => {
       dataIndex: 'unitId',
       key: 'unitId',
       width: '15%',
+      responsive: ['md'],
     },
     {
       title: 'ID da Empresa',
       dataIndex: 'companyId',
       key: 'companyId',
       width: '15%',
+      responsive: ['md'],
     },
     {
       title: 'Ação',

@@ -151,7 +151,7 @@ export const OverviewRightContent: React.FC = () => {
                     angleField="count"
                     colorField="status"
                     legend={false}
-                    radius={0.7}
+                    radius={0.65}
                     animation={false}
                     color={(d: Datum) => {
                       if (d.status === 'Em Alerta') return '#f5222d';

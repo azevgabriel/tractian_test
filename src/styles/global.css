@@ -71,3 +71,21 @@ p {
 ::-webkit-scrollbar-thumb {
   background-color: var(--color-primary);
 }
+
+@media (max-width: 1000px) {
+  .rightContentHeader {
+    margin-left: auto;
+  }
+  .rightContentHeader p {
+    display: none;
+  }
+  .header img {
+    display: none;
+  }
+}
+
+@media (max-width: 575px) {
+  .ant-form .ant-form-item {
+    flex-wrap: none;
+  }
+}

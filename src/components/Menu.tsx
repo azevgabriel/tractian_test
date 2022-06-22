@@ -90,7 +90,7 @@ export const MenuWrapper: React.FC<MenuWrapperProps> = ({
       onOpenChange={onOpenChange}
       selectedKeys={selectedKeys}
       onSelect={onSelect}
-      style={{ width: 250, marginTop: 5 }}
+      style={{ width: '100%', marginTop: 5 }}
       items={isAdmin ? adminItems : userItems}
       theme="dark"
     />

@@ -254,6 +254,7 @@ export const AssetsRightContent = ({ filter }: AssetsRightContentProps) => {
       dataIndex: 'id',
       key: 'id',
       width: '10%',
+      responsive: ['lg'],
     },
     {
       title: 'Nome do ativo',
@@ -275,6 +276,7 @@ export const AssetsRightContent = ({ filter }: AssetsRightContentProps) => {
         { text: 'motor', value: 'motor' },
         { text: 'fan', value: 'fan' },
       ],
+      responsive: ['md'],
     },
     {
       title: 'Status',
@@ -309,6 +311,7 @@ export const AssetsRightContent = ({ filter }: AssetsRightContentProps) => {
           suffix="/ 100"
         />
       ),
+      responsive: ['md'],
     },
     {
       title: 'Ação',
