@@ -80,6 +80,30 @@ p {
     display: none;
   }
   .header img {
+    position: fixed;
+    width: 150px;
+    left: calc(50vw - 75px);
+  }
+}
+
+@media (max-width: 450px) {
+  .header img {
+    position: fixed;
+    width: 100px;
+    left: calc(50vw - 50px);
+  }
+}
+
+@media (max-width: 350px) {
+  .header img {
+    position: fixed;
+    width: 75px;
+    left: calc(50vw - 37.5px);
+  }
+}
+
+@media (max-width: 270px) {
+  .header img {
     display: none;
   }
 }

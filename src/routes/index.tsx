@@ -32,9 +32,7 @@ export const AppRoutes = () => {
               style={{
                 color: '#eee',
               }}
-            >
-              Sair
-            </Button>
+            />
           </div>
         </Header>
         <UserRoutes />

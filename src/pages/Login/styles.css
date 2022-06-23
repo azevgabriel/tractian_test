@@ -83,14 +83,19 @@
 }
 
 @media (max-width: 575px) {
-  .form .ant-form-item {
-    flex-wrap: nowrap;
-    padding: 0 5%;
-  }
   .form .ant-col-5 {
     max-width: 30% !important;
+    padding-left: 5%;
   }
   .form .ant-col-17 {
     max-width: 70% !important;
+    max-height: 20px !important;
+    padding-right: 5%;
+  }
+  .form .ant-form-item {
+    height: max-content !important;
+  }
+  .form .ant-form-item:last-child {
+    margin-top: 20px;
   }
 }
