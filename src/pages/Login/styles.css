@@ -70,6 +70,18 @@
   font-size: 2rem;
 }
 
+.form .ant-form-item {
+  height: max-content !important;
+}
+
+.form .ant-col-17 {
+  max-height: 30px !important;
+}
+
+.form .ant-form-item:last-child {
+  margin-top: 20px;
+}
+
 @media (max-width: 1005px) {
   .codeArea {
     display: none;
@@ -83,19 +95,12 @@
 }
 
 @media (max-width: 575px) {
+  .form .ant-col-17 {
+    max-width: 70% !important;
+    padding-right: 5%;
+  }
   .form .ant-col-5 {
     max-width: 30% !important;
     padding-left: 5%;
-  }
-  .form .ant-col-17 {
-    max-width: 70% !important;
-    max-height: 20px !important;
-    padding-right: 5%;
-  }
-  .form .ant-form-item {
-    height: max-content !important;
-  }
-  .form .ant-form-item:last-child {
-    margin-top: 20px;
   }
 }
