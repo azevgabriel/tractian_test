@@ -3,10 +3,10 @@
 </h1>
 
 <p align="center">
-  <img src="https://img.shields.io/github/languages/top/azevgabriel/educacao_especial">
-  <img src="https://img.shields.io/github/issues/azevgabriel/educacao_especial">
-  <img src="https://img.shields.io/github/forks/azevgabriel/educacao_especial">
-  <img src="https://img.shields.io/github/stars/azevgabriel/educacao_especial">
+  <img src="https://img.shields.io/github/languages/top/azevgabriel/tractian_test">
+  <img src="https://img.shields.io/github/issues/azevgabriel/tractian_test">
+  <img src="https://img.shields.io/github/forks/azevgabriel/tractian_test">
+  <img src="https://img.shields.io/github/stars/azevgabriel/tractian_test">
 </p>
 
 <img src="./src/assets/screenshot.png">
